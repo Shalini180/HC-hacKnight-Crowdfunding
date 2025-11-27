@@ -21,6 +21,24 @@ The application features a modern, responsive user interface designed with React
 *   **Discovery Feed**: Browse and filter available campaigns with a responsive masonry layout.
 *   **Secure Donations**: Direct ETH transfers to campaign smart contracts with real-time progress tracking.
 
+## Architecture
+
+```mermaid
+graph TD
+    User[User] -->|Interacts with| UI[Frontend (React + Vite)]
+    UI -->|Connects Wallet| Wallet[MetaMask]
+    UI -->|Reads/Writes Data| SC[Smart Contract (Sepolia)]
+    UI -->|Uploads/Retrieves Media| IPFS[IPFS (Pinata)]
+    Wallet -->|Signs Transactions| SC
+    SC -->|Stores State| Blockchain[Ethereum Blockchain]
+    
+    style UI fill:#1e293b,stroke:#334155,color:#fff
+    style SC fill:#4c1d95,stroke:#6d28d9,color:#fff
+    style IPFS fill:#0f766e,stroke:#14b8a6,color:#fff
+    style Wallet fill:#ea580c,stroke:#f97316,color:#fff
+    style Blockchain fill:#1e1e1e,stroke:#333,color:#fff
+```
+
 ## Technology Stack
 
 ### Frontend
