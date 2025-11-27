@@ -11,7 +11,8 @@ import Crustcreate from "./pages/Crustcreate/crustcreate";
 import ReactGA from "react-ga";
 import $ from "jquery";
 import Header from "./components/Header"
-import Navbar from "./components/NavBar/NavBar";
+import Navbar from "./components/Navbar";
+
 class App extends React.Component {
 
   constructor(props) {
@@ -30,10 +31,10 @@ class App extends React.Component {
       url: "./resumeData.json",
       dataType: "json",
       cache: false,
-      success: function(data) {
+      success: function (data) {
         this.setState({ resumeData: data });
       }.bind(this),
-      error: function(xhr, status, err) {
+      error: function (xhr, status, err) {
         console.log(err);
         alert(err);
       }
@@ -44,24 +45,26 @@ class App extends React.Component {
     this.getResumeData();
   }
 
-  render(){
-   
+  render() {
+
     return (
-     
-        <BrowserRouter>
+      <BrowserRouter>
+        <main className="min-h-screen bg-slate-950">
+          <Navbar />
           <Routes>
-            <Route path="/" element={<Header data={this.state.resumeData.main}/>}></Route>
+            <Route path="/" element={<Header data={this.state.resumeData.main} />}></Route>
             <Route path="/createfund" element={<Createfund />}></Route>
             <Route path="/displayfunds" element={<Display />}></Route>
             <Route path="/donate" element={<Donate />}></Route>
             <Route path="/reactcards" element={<Reactcards />}></Route>
-            <Route path="/dashboard" element={<Dashboard />}></Route> 
-            <Route path="/crustcreate" element={<Crustcreate />}></Route> 
-            <Route path="/Authenticate" element={<Authenticate />}></Route> 
+            <Route path="/dashboard" element={<Dashboard />}></Route>
+            <Route path="/crustcreate" element={<Crustcreate />}></Route>
+            <Route path="/Authenticate" element={<Authenticate />}></Route>
           </Routes>
-        </BrowserRouter>
+        </main>
+      </BrowserRouter>
     );
   }
-  
+
 }
 export default App;
