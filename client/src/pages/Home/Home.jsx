@@ -1,6 +1,6 @@
 import React from 'react'
-import Hero from '../components/Hero'
-import CampaignCard from '../components/CampaignCard'
+import Hero from '../../components/Hero'
+import CampaignCard from '../../components/CampaignCard'
 
 const Home = () => {
     // Mock campaign data - replace with actual data from blockchain/API

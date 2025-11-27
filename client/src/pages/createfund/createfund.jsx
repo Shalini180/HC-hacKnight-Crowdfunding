@@ -1,171 +1,279 @@
-import React from 'react';
-import ipfs from './../ipfs';
-import './../../styles/createfund.css';
-import getWeb3 from "./../../getWeb3";
-import FundRaiserContract from "./../../contracts/fundraiser.json";
-import Navbar from "./../../components/NavBar/NavBar";
-import styled from "styled-components";
+import React, { useState } from 'react'
+import { Upload, Rocket, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import ipfs from './../ipfs'
+import getWeb3 from "./../../getWeb3"
+import FundRaiserContract from "./../../contracts/fundraiser.json"
 
-const Styles = styled.div`
-// background: lavender;
- padding: 30px;
- background: url('https://www.readz.com/image/8359264.1620928269000/gradient-backgrounds.webp');
- background-repeat: no-repeat;
- background-size: cover;
- h1 {
-   border-bottom: 1px solid white;
-   color: #3d3d3d;
-   font-family: sans-serif;
-   font-size: 20px;
-   font-weight: 600;
-   line-height: 24px;
-   padding: 10px;
-   text-align: center;
- }
+const CreateFund = () => {
+  const [web3, setWeb3] = useState(null)
+  const [accounts, setAccounts] = useState(null)
+  const [contract, setContract] = useState(null)
+  const [status, setStatus] = useState({ type: '', message: '' })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
- form {
-   background-image: url('http://www.designshock.com/wp-content/uploads/2014/08/16_thumb1.jpg');
-   background-repeat: no-repeat;
-   background-size: cover;
-   border: 1px solid #dedede;
-   display: flex;
-   flex-direction: column;
-   justify-content: space-around;
-   margin: 0 auto;
-   max-width: 500px;
-   padding: 30px 50px;
- }
+  React.useEffect(() => {
+    initWeb3()
+  }, [])
 
- input {
-   border: 1px solid #d9d9d9;
-   border-radius: 4px;
-   box-sizing: border-box;
-   padding: 10px;
-   width: 100%;
- }
-
- label {
-   color: #3d3d3d;
-   display: block;
-   font-family: sans-serif;
-   font-size: 14px;
-   font-weight: 500;
-   margin-bottom: 5px;
- }
-
- .submitButton {
-   background-color: #6976d9;
-   color: white;
-   font-family: sans-serif;
-   font-size: 14px;
-   margin: 20px 0px;
- }
-`;
-
-
-
-class createfund extends React.Component{
-  constructor(props){
-    super(props);
-  }
-  state = { web3: null, accounts: null, contract: null };
-
-  componentDidMount = async () => {
+  const initWeb3 = async () => {
     try {
-      // Get network provider and web3 instance.
-      const web3 = await getWeb3();
-
-      // Use web3 to get the user's accounts.
-      const accounts = await web3.eth.getAccounts();
-
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = FundRaiserContract.networks[networkId];
-      const instance = new web3.eth.Contract(
+      const web3Instance = await getWeb3()
+      const accountsList = await web3Instance.eth.getAccounts()
+      const networkId = await web3Instance.eth.net.getId()
+      const deployedNetwork = FundRaiserContract.networks[networkId]
+      const contractInstance = new web3Instance.eth.Contract(
         FundRaiserContract.abi,
         deployedNetwork && deployedNetwork.address,
-      );
-
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance });
+      )
+      setWeb3(web3Instance)
+      setAccounts(accountsList)
+      setContract(contractInstance)
+      setStatus({ type: 'success', message: 'Wallet connected successfully' })
     } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
-      console.error(error);
+      setStatus({ type: 'error', message: 'Failed to connect wallet. Please check MetaMask.' })
+      console.error(error)
     }
-  };
-
-  addnewfundraiser = async(ipfshash,goal) =>{
-    const metamaskAddr = this.state.accounts[0];
-    const contract = this.state.contract;
-    console.log(metamaskAddr)
-    await contract.methods.createfundraiser(ipfshash,goal).send({ from: metamaskAddr });
   }
 
-  handlesignUp = async (event) => {
-    event.preventDefault();
-    const fName = event.target[1].value;
-    const lName = event.target[2].value;
-    const goal = event.target[3].value;
-    const minimum = event.target[4].value;
-    const address = event.target[5].value;
-    const date = event.target[6].value;
-    const description = event.target[7].value;
-    const data = {firstname: fName,lastname:lName,goalamount:goal,minimumamount:minimum,recipient:address,date1:date,descr:description};
-    console.log(JSON.stringify(data));
-    var ipfshash;
-    //fetching details
-    ipfs.files.get("QmdW5C6a5bLfGsTo6WAg9ZfcuxK69JQBXxZGQgwfac9pMn", function (err, files) {
-      console.log(files);
-      // files.forEach(function callback(file) {
-      //   console.log(file.path)
-      //   console.log("File content >> ", file.content.toString('utf8'))})
-      console.log("filecontent",files[0].content.toString('utf8'))
+  const addNewFundraiser = async (ipfshash, goal) => {
+    const metamaskAddr = accounts[0]
+    await contract.methods.createfundraiser(ipfshash, goal).send({ from: metamaskAddr })
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setIsSubmitting(true)
+    setStatus({ type: 'loading', message: 'Uploading to IPFS...' })
+
+    const formData = {
+      firstname: event.target.firstName.value,
+      lastname: event.target.lastName.value,
+      goalamount: event.target.goal.value,
+      minimumamount: event.target.minimum.value,
+      recipient: event.target.address.value,
+      date1: event.target.date.value,
+      descr: event.target.description.value,
+    }
+
+    try {
+      // Upload to IPFS
+      ipfs.files.add(Buffer(JSON.stringify(formData)), async (error, result) => {
+        if (error) {
+          setStatus({ type: 'error', message: 'IPFS upload failed' })
+          setIsSubmitting(false)
+          return
+        }
+
+        const ipfshash = result[0].hash
+        setStatus({ type: 'loading', message: 'Creating campaign on blockchain...' })
+
+        try {
+          await addNewFundraiser(ipfshash, formData.goalamount)
+          setStatus({ type: 'success', message: 'Campaign created successfully!' })
+          event.target.reset()
+        } catch (err) {
+          setStatus({ type: 'error', message: 'Transaction failed. Please try again.' })
+        }
+        setIsSubmitting(false)
       })
-    ipfs.files.add(Buffer(JSON.stringify(data)), (error, result) => {
-      if(error) {
-            console.error(error)
-            return
-          }
-      
-       ipfshash = result[0].hash
-       console.log('ifpsHash', result[0].hash)
-       this.addnewfundraiser(ipfshash,goal);
-    })
-  } 
-  render(){
-    return(
-      <div>
-      <Navbar />
-      <Styles>
-      <div id="formContainer">
-          <form id="form" onSubmit={this.handlesignUp} >
-            <fieldset>
-              <h1>Create Fund</h1>
-              <div id="fullName">
-                <input type="text" name="fName" id="fName" placeholder="First Name" required />
-                <input type="text" name="lName" id="lName" placeholder="Last Name" required />
+    } catch (error) {
+      setStatus({ type: 'error', message: 'An error occurred' })
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen py-20 px-4">
+      {/* Background Glow */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-pink-600/10 rounded-full blur-[100px]"></div>
+      </div>
+
+      <div className="relative max-w-2xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold mb-4">
+            <span className="gradient-text from-purple-400 to-pink-600">
+              Launch Your Vision
+            </span>
+          </h1>
+          <p className="text-slate-400 text-lg">
+            DeFi Crowdfunding made simple. Create your campaign in minutes.
+          </p>
+        </div>
+
+        {/* Form Card */}
+        <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-2xl p-8 shadow-2xl">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Name Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="firstName" className="block text-sm font-medium text-slate-300 mb-2">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  required
+                  className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all outline-none"
+                  placeholder="Satoshi"
+                />
               </div>
-              <div id="otherInputs">
-                <input type="number" name="goal" id="goal" placeholder="goal amount" required />
-                <input type="number" name="minimum" id="minimum" placeholder="minimum donation" required />
-                <input type="text" name="address" id="address" placeholder="Recipient address" required />
-                <input type="date" name="date" id="date" placeholder="expiry date" required />
-                <input type="text" name="description" id="description" placeholder="description" required />
+              <div>
+                <label htmlFor="lastName" className="block text-sm font-medium text-slate-300 mb-2">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  required
+                  className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all outline-none"
+                  placeholder="Nakamoto"
+                />
               </div>
-              <br /><br />
-              <input type="submit" name="submit" id="submit" />
-            </fieldset>
+            </div>
+
+            {/* Goal Amount */}
+            <div>
+              <label htmlFor="goal" className="block text-sm font-medium text-slate-300 mb-2">
+                Goal Amount (ETH)
+              </label>
+              <input
+                type="number"
+                id="goal"
+                name="goal"
+                required
+                step="0.01"
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all outline-none"
+                placeholder="10.0"
+              />
+            </div>
+
+            {/* Minimum Donation */}
+            <div>
+              <label htmlFor="minimum" className="block text-sm font-medium text-slate-300 mb-2">
+                Minimum Donation (ETH)
+              </label>
+              <input
+                type="number"
+                id="minimum"
+                name="minimum"
+                required
+                step="0.001"
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all outline-none"
+                placeholder="0.01"
+              />
+            </div>
+
+            {/* Recipient Address */}
+            <div>
+              <label htmlFor="address" className="block text-sm font-medium text-slate-300 mb-2">
+                Recipient Wallet Address
+              </label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                required
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all outline-none font-mono text-sm"
+                placeholder="0x..."
+              />
+            </div>
+
+            {/* Expiry Date */}
+            <div>
+              <label htmlFor="date" className="block text-sm font-medium text-slate-300 mb-2">
+                Campaign End Date
+              </label>
+              <input
+                type="date"
+                id="date"
+                name="date"
+                required
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-lg text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all outline-none"
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-slate-300 mb-2">
+                Campaign Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                required
+                rows="4"
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all outline-none resize-none"
+                placeholder="Describe your project and what you plan to build..."
+              />
+            </div>
+
+            {/* Image Upload Area (Placeholder) */}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Campaign Image
+              </label>
+              <div className="border-2 border-dashed border-slate-700 rounded-lg p-8 text-center hover:border-purple-500 transition-colors cursor-pointer">
+                <Upload className="w-12 h-12 text-slate-500 mx-auto mb-3" />
+                <p className="text-slate-400 text-sm">
+                  Drag & drop your image here, or click to browse
+                </p>
+                <p className="text-slate-600 text-xs mt-1">
+                  PNG, JPG up to 10MB
+                </p>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting || !contract}
+              className="w-full py-4 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <>
+                  <Rocket className="w-5 h-5" />
+                  <span>Mint Campaign</span>
+                </>
+              )}
+            </button>
+
+            {/* Status Message */}
+            {status.message && (
+              <div className={`p-4 rounded-lg flex items-center gap-3 ${status.type === 'success' ? 'bg-green-500/10 border border-green-500/20' :
+                  status.type === 'error' ? 'bg-red-500/10 border border-red-500/20' :
+                    'bg-blue-500/10 border border-blue-500/20'
+                }`}>
+                {status.type === 'success' && <CheckCircle className="w-5 h-5 text-green-400" />}
+                {status.type === 'error' && <AlertCircle className="w-5 h-5 text-red-400" />}
+                {status.type === 'loading' && <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />}
+                <p className={`text-sm ${status.type === 'success' ? 'text-green-300' :
+                    status.type === 'error' ? 'text-red-300' :
+                      'text-blue-300'
+                  }`}>
+                  {status.message}
+                </p>
+              </div>
+            )}
           </form>
         </div>
-      </Styles>
+
+        {/* Help Text */}
+        <p className="text-center text-slate-500 text-sm mt-6">
+          Your campaign will be stored on IPFS and minted as an NFT on the blockchain
+        </p>
       </div>
-        
-    )
-  }
+    </div>
+  )
 }
 
-export default createfund;
+export default CreateFund
