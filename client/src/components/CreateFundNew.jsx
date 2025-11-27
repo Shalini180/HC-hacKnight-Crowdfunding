@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../Navbar';
+import Navbar from './Navbar';
 import ImageUploadZone from './create/ImageUploadZone';
 import { Loader2, Rocket } from 'lucide-react';
 
