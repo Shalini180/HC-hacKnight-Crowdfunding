@@ -10,7 +10,7 @@ import Reactcards from "./pages/Reactcards/reactcards";
 import Crustcreate from "./pages/Crustcreate/crustcreate";
 import ReactGA from "react-ga";
 import $ from "jquery";
-import Header from "./components/Header"
+import Home from "./pages/Home/Home";
 import Navbar from "./components/Navbar";
 
 class App extends React.Component {
@@ -52,7 +52,7 @@ class App extends React.Component {
         <main className="min-h-screen bg-slate-950">
           <Navbar />
           <Routes>
-            <Route path="/" element={<Header data={this.state.resumeData.main} />}></Route>
+            <Route path="/" element={<Home />}></Route>
             <Route path="/createfund" element={<Createfund />}></Route>
             <Route path="/displayfunds" element={<Display />}></Route>
             <Route path="/donate" element={<Donate />}></Route>
