@@ -1,100 +1,113 @@
-<div align="center">
-  <img src="./screenshots/dashboard.png" alt="CrowdCoin Dashboard" width="100%" />
+# CrowdCoin
 
-  # CrowdCoin
-  ### The Future of Decentralized Funding
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=flat&logo=react&logoColor=%2361DAFB)
+![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=flat&logo=vite&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=flat&logo=tailwind-css&logoColor=white)
+![Solidity](https://img.shields.io/badge/Solidity-%23363636.svg?style=flat&logo=solidity&logoColor=white)
+![Hardhat](https://img.shields.io/badge/Hardhat-yellow.svg)
 
-  [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
-  [![Vite](https://img.shields.io/badge/Vite-5.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-  [![Solidity](https://img.shields.io/badge/Solidity-0.8-363636?style=for-the-badge&logo=solidity&logoColor=white)](https://soliditylang.org/)
-  [![Sepolia](https://img.shields.io/badge/Network-Sepolia-blue?style=for-the-badge&logo=ethereum&logoColor=white)](https://sepolia.etherscan.io/)
-  [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](./LICENSE)
-  [![Status](https://img.shields.io/badge/Status-Live-success?style=for-the-badge)]()
+CrowdCoin is a decentralized crowdfunding platform built on the Ethereum Sepolia network. It leverages blockchain technology to provide a transparent, secure, and efficient way for creators to raise funds and for backers to support projects.
 
-  <p align="center">
-    <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FShalini180%2FHC-hacKnight-Crowdfunding">
-      <img src="https://vercel.com/button" alt="Deploy with Vercel" />
-    </a>
-  </p>
-</div>
+The application features a modern, responsive user interface designed with React and Tailwind CSS, interacting with smart contracts via Ethers.js.
 
----
+![Dashboard Screenshot](./screenshots/dashboard.png)
 
-## 🌌 Feature Spotlights
+## Features
 
-### Galactic Authentication
-Experience a seamless entry into the Web3 universe. Our deep-space glassmorphism login integrates directly with MetaMask, providing secure and stylish access.
-![Login](./screenshots/login.png)
+*   **Decentralized Authentication**: Secure login using MetaMask wallet connection.
+*   **Campaign Creation**: Users can create new fundraising campaigns with details stored on IPFS (via Pinata) and the blockchain.
+*   **Real-time Dashboard**: Interactive dashboard displaying fundraising statistics and active campaigns.
+*   **Discovery Feed**: Browse and filter available campaigns with a responsive masonry layout.
+*   **Secure Donations**: Direct ETH transfers to campaign smart contracts with real-time progress tracking.
 
-### 🚀 Seamless Minting
-Launch your vision in seconds. The campaign creation wizard features a drag-and-drop IPFS upload zone with real-time preview and instant smart contract minting.
-![Create](./screenshots/create.png)
+## Technology Stack
 
-### 🛍️ Immersive Discovery
-Explore the ecosystem through a masonry-style feed. Each campaign card is a portal to innovation, featuring glowing hover effects and live progress tracking.
-![Feed](./screenshots/feed.png)
+### Frontend
+*   **React 18**: UI library for building the interface.
+*   **Vite**: Build tool and development server.
+*   **Tailwind CSS**: Utility-first CSS framework for styling.
+*   **Framer Motion**: Library for UI animations.
+*   **Lucide React**: Icon set.
 
-### 💸 Sticky Funding Dock
-A high-conversion checkout experience. The sticky funding dock ensures backers can support projects instantly without losing context of the campaign story.
-![Donate](./screenshots/donate.png)
+### Backend & Blockchain
+*   **Solidity**: Smart contract programming language.
+*   **Hardhat**: Ethereum development environment for compiling, deploying, and testing.
+*   **Ethers.js**: Library for interacting with the Ethereum blockchain.
+*   **IPFS (Pinata)**: Decentralized storage for campaign media and metadata.
+*   **Sepolia Testnet**: Ethereum test network for deployment.
 
----
+## Getting Started
 
-## 🛠️ Tech Stack
+### Prerequisites
+*   Node.js (v16 or higher)
+*   npm or yarn
+*   MetaMask browser extension
 
-| Frontend | Backend | Infrastructure |
-| :--- | :--- | :--- |
-| **React 18** | **Solidity** | **IPFS (Pinata)** |
-| **Vite** | **Hardhat** | **Sepolia Testnet** |
-| **Tailwind CSS** | **Ethers.js** | **Alchemy RPC** |
-| **Framer Motion** | **OpenZeppelin** | **Vercel** |
+### Installation
 
----
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/Shalini180/HC-hacKnight-Crowdfunding.git
+    cd HC-hacKnight-Crowdfunding
+    ```
 
-## 🚀 Zero-Friction Setup
+2.  **Install dependencies**
+    ```bash
+    # Install root dependencies (for Hardhat)
+    npm install
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/Shalini180/HC-hacKnight-Crowdfunding.git
-cd HC-hacKnight-Crowdfunding
-```
+    # Install client dependencies (for React)
+    cd client
+    npm install
+    cd ..
+    ```
 
-### 2. Configure Secrets
-Create a `.env` file in the `client/` directory based on the structure below:
+3.  **Environment Configuration**
 
-```env
-# Client Secrets (client/.env)
-VITE_PINATA_JWT=your_pinata_jwt_token_here
-VITE_CONTRACT_ADDRESS=0xYourDeployedContractAddress
-```
+    Create a `.env` file in the root directory for Hardhat:
+    ```env
+    SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_ALCHEMY_KEY
+    PRIVATE_KEY=YOUR_WALLET_PRIVATE_KEY
+    ```
 
-For backend deployment, create a `.env` in the root:
-```env
-# Root Secrets (.env)
-SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/your-api-key
-PRIVATE_KEY=your_wallet_private_key
-```
+    Create a `.env` file in the `client/` directory for the frontend:
+    ```env
+    VITE_PINATA_JWT=YOUR_PINATA_JWT_TOKEN
+    VITE_CONTRACT_ADDRESS=YOUR_DEPLOYED_CONTRACT_ADDRESS
+    ```
 
-### 3. Launch Locally
-Start the development server and blast off! 🚀
+### Deployment
 
-```bash
-cd client
-npm install
-npm run dev
-```
-
-### 4. Deploy Smart Contracts
-If you want to deploy your own instance of the contract:
+To deploy the smart contracts to the Sepolia testnet:
 
 ```bash
-npm install
 npx hardhat run scripts/deploy.js --network sepolia
 ```
 
----
+After deployment, update the `VITE_CONTRACT_ADDRESS` in `client/.env` with the new contract address.
 
-<div align="center">
-  <p>Built with ❤️ for the <strong>HackNight</strong> Hackathon.</p>
-  <p><i>Design inspired by the cosmos. Logic powered by Ethereum.</i></p>
-</div>
+### Running Locally
+
+Start the frontend development server:
+
+```bash
+cd client
+npm run dev
+```
+
+The application will be available at `http://localhost:5173`.
+
+## Screenshots
+
+| Dashboard | Campaign Feed |
+|:---:|:---:|
+| <img src="./screenshots/dashboard.png" width="100%" /> | <img src="./screenshots/feed.png" width="100%" /> |
+
+| Create Campaign | Donation |
+|:---:|:---:|
+| <img src="./screenshots/create.png" width="100%" /> | <img src="./screenshots/donate.png" width="100%" /> |
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
