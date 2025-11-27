@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Rocket } from 'lucide-react';
 import PageHeader from './ui/PageHeader';
 import GradientButton from './ui/GradientButton';
 import StatsGrid from './dashboard/StatsGrid';
 import CampaignTable from './dashboard/CampaignTable';
+import useCrowdfunding from '../hooks/useCrowdfunding';
 
 const DashboardNew = () => {
+    const { getCampaigns, campaigns, isLoading } = useCrowdfunding();
+
+    useEffect(() => {
+        getCampaigns();
+    }, [getCampaigns]);
+
     return (
         <div className="min-h-screen bg-slate-950 text-white p-8 relative overflow-hidden">
             {/* Background Mesh Gradient */}
@@ -25,7 +32,7 @@ const DashboardNew = () => {
                 <StatsGrid />
 
                 {/* Main Table */}
-                <CampaignTable />
+                <CampaignTable campaigns={campaigns} isLoading={isLoading} />
             </div>
         </div>
     );

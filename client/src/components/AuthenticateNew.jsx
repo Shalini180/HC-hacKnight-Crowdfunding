@@ -1,26 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield } from 'lucide-react';
 import AuthModal from './auth/AuthModal';
 import WalletConnectButton from './auth/WalletConnectButton';
 import SocialProof from './auth/SocialProof';
+import { useWeb3 } from '../context/Web3Context';
 
 const AuthenticateNew = () => {
-    const [status, setStatus] = useState('idle'); // 'idle', 'connecting', 'connected'
+    const { connectWallet, isConnecting, address } = useWeb3();
     const navigate = useNavigate();
 
+    useEffect(() => {
+        if (address) {
+            navigate('/dashboard');
+        }
+    }, [address, navigate]);
+
     const handleConnect = () => {
-        setStatus('connecting');
-
-        // Simulate connection delay
-        setTimeout(() => {
-            setStatus('connected');
-
-            // Redirect to dashboard after success
-            setTimeout(() => {
-                navigate('/dashboard');
-            }, 800);
-        }, 1500);
+        connectWallet();
     };
 
     return (
@@ -41,7 +38,10 @@ const AuthenticateNew = () => {
                 </div>
 
                 <div className="space-y-4">
-                    <WalletConnectButton status={status} onClick={handleConnect} />
+                    <WalletConnectButton
+                        status={isConnecting ? 'connecting' : address ? 'connected' : 'idle'}
+                        onClick={handleConnect}
+                    />
 
                     <button className="w-full py-4 rounded-xl bg-white/5 border border-white/10 text-white font-medium hover:bg-white/10 transition-colors">
                         Read Documentation
