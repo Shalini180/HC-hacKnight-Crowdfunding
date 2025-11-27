@@ -1,14 +1,11 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield } from 'lucide-react';
-import AuthModal from './auth/AuthModal';
+import { useWeb3 } from '../../context/Web3Context';
 import WalletConnectButton from './auth/WalletConnectButton';
-import SocialProof from './auth/SocialProof';
-import { useWeb3 } from '../context/Web3Context';
 
 const AuthenticateNew = () => {
-    const { connectWallet, isConnecting, address } = useWeb3();
     const navigate = useNavigate();
+    const { connectWallet, address, isConnecting } = useWeb3();
 
     useEffect(() => {
         if (address) {
@@ -16,40 +13,32 @@ const AuthenticateNew = () => {
         }
     }, [address, navigate]);
 
-    const handleConnect = () => {
-        connectWallet();
-    };
-
     return (
-        <div className="min-h-screen bg-[#050507] text-white flex items-center justify-center relative overflow-hidden">
-            {/* Space Background Effects */}
-            <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
-                {/* Stars would go here with CSS */}
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center relative overflow-hidden">
+            {/* Background Effects */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-600/20 rounded-full blur-[120px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px]" />
             </div>
 
-            <AuthModal>
-                <div className="text-center mb-10">
-                    <div className="w-16 h-16 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg shadow-purple-500/30 transform rotate-3">
-                        <Shield size={32} className="text-white" />
-                    </div>
-                    <h1 className="text-3xl font-bold mb-2">Welcome to FutureFund</h1>
-                    <p className="text-slate-400">Connect your wallet to access the future of funding.</p>
+            <div className="glass p-8 rounded-2xl w-full max-w-md relative z-10 flex flex-col items-center text-center border border-white/10 shadow-2xl">
+                <div className="mb-8">
+                    <h1 className="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-indigo-400">
+                        CrowdCoin
+                    </h1>
+                    <p className="text-slate-400">
+                        The future of decentralized funding
+                    </p>
                 </div>
 
-                <div className="space-y-4">
+                <div className="w-full flex justify-center">
                     <WalletConnectButton
-                        status={isConnecting ? 'connecting' : address ? 'connected' : 'idle'}
-                        onClick={handleConnect}
+                        isConnecting={isConnecting}
+                        address={address}
+                        onConnect={connectWallet}
                     />
-
-                    <button className="w-full py-4 rounded-xl bg-white/5 border border-white/10 text-white font-medium hover:bg-white/10 transition-colors">
-                        Read Documentation
-                    </button>
                 </div>
-
-                <SocialProof />
-            </AuthModal>
+            </div>
         </div>
     );
 };

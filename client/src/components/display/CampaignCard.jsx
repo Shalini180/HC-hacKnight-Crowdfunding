@@ -1,51 +1,65 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Tag } from 'lucide-react';
+import { Clock, Target, User } from 'lucide-react';
 
-const CampaignCard = ({ campaign }) => {
+const CampaignCard = ({ title, image, owner, raised, target, deadline, onClick }) => {
+    const progress = Math.min((parseFloat(raised) / parseFloat(target)) * 100, 100);
+
     return (
-        <motion.div
-            layout
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            whileHover={{ y: -10 }}
-            className="group relative aspect-[4/5] rounded-3xl overflow-hidden cursor-pointer bg-slate-900"
+        <div
+            onClick={onClick}
+            className="group bg-slate-900 rounded-xl border border-white/5 overflow-hidden hover:border-violet-500/30 hover:shadow-[0_0_30px_rgba(124,58,237,0.1)] transition-all duration-300 cursor-pointer hover:scale-[1.02]"
         >
-            {/* Background Image */}
-            <img
-                src={campaign.image}
-                alt={campaign.title}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-            />
-
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-
-            {/* Content */}
-            <div className="absolute bottom-0 left-0 right-0 p-8 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                <div className="flex items-center gap-2 mb-3">
-                    <span className="px-3 py-1 rounded-lg bg-white/10 backdrop-blur-md text-xs font-medium text-purple-300 border border-white/10">
-                        {campaign.category}
-                    </span>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2 leading-tight group-hover:text-purple-400 transition-colors">
-                    {campaign.title}
-                </h3>
-                <div className="flex items-center justify-between mt-4 border-t border-white/10 pt-4">
-                    <div className="flex flex-col">
-                        <span className="text-xs text-slate-400 uppercase tracking-wider">Raised</span>
-                        <span className="text-lg font-bold text-white">{campaign.raised}</span>
-                    </div>
-                    <button className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-purple-500 hover:text-white">
-                        <Tag size={18} />
-                    </button>
-                </div>
+            {/* Image Container */}
+            <div className="aspect-video w-full overflow-hidden relative">
+                <img
+                    src={image}
+                    alt={title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60" />
             </div>
 
-            {/* Hover Glow Effect */}
-            <div className="absolute inset-0 border-2 border-purple-500/0 group-hover:border-purple-500/50 rounded-3xl transition-colors duration-300 pointer-events-none" />
-        </motion.div>
+            {/* Content */}
+            <div className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                    <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center">
+                        <User className="w-3 h-3 text-slate-400" />
+                    </div>
+                    <span className="text-xs text-slate-400 font-mono truncate max-w-[150px]">
+                        {owner}
+                    </span>
+                </div>
+
+                <h3 className="text-lg font-bold text-white mb-2 line-clamp-1 group-hover:text-violet-400 transition-colors">
+                    {title}
+                </h3>
+
+                <div className="flex items-center justify-between text-sm text-slate-400 mb-4">
+                    <div className="flex items-center gap-1">
+                        <Target className="w-4 h-4" />
+                        <span>{target} ETH</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        <span>{deadline} days left</span>
+                    </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="space-y-2">
+                    <div className="flex justify-between text-xs font-medium">
+                        <span className="text-violet-400">{raised} ETH Raised</span>
+                        <span className="text-slate-500">{Math.round(progress)}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-violet-600 to-indigo-600 transition-all duration-500"
+                            style={{ width: `${progress}%` }}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };
 

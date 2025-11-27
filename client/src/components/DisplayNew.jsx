@@ -1,34 +1,61 @@
-import React, { useState } from 'react';
-import FilterBar from './display/FilterBar';
-import CampaignGrid from './display/CampaignGrid';
-
-const mockCampaigns = [
-    { id: 1, title: "Cyberpunk City", category: "Art", image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop", raised: "120 ETH" },
-    { id: 2, title: "Quantum Network", category: "Tech", image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2680&auto=format&fit=crop", raised: "450 ETH" },
-    { id: 3, title: "Mars Colony", category: "Science", image: "https://images.unsplash.com/photo-1614728853913-1e22ba0e9897?q=80&w=2670&auto=format&fit=crop", raised: "1.2k ETH" },
-    { id: 4, title: "DeFi Protocol", category: "Crypto", image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2664&auto=format&fit=crop", raised: "89 ETH" },
-    { id: 5, title: "Digital Renaissance", category: "Art", image: "https://images.unsplash.com/photo-1618172193763-c511deb635ca?q=80&w=2564&auto=format&fit=crop", raised: "230 ETH" },
-    { id: 6, title: "Green Energy Grid", category: "Tech", image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?q=80&w=2670&auto=format&fit=crop", raised: "67 ETH" },
-];
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Navbar from '../Navbar';
+import CampaignCard from './display/CampaignCard';
+import { Loader2 } from 'lucide-react';
 
 const DisplayNew = () => {
-    const [activeCategory, setActiveCategory] = useState("All");
-    const [searchQuery, setSearchQuery] = useState("");
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(true);
+    const [campaigns, setCampaigns] = useState([]);
 
-    const filteredCampaigns = mockCampaigns.filter(c =>
-        (activeCategory === "All" || c.category === activeCategory) &&
-        c.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    useEffect(() => {
+        // Mock fetch campaigns
+        const fetchCampaigns = () => {
+            setTimeout(() => {
+                const mockData = Array(6).fill(null).map((_, i) => ({
+                    id: i,
+                    title: `Future Tech Project #${i + 1}`,
+                    image: `https://picsum.photos/seed/${i + 1}/800/450`,
+                    owner: "0x1234...5678",
+                    raised: (Math.random() * 5).toFixed(2),
+                    target: "10.0",
+                    deadline: Math.floor(Math.random() * 30) + 1
+                }));
+                setCampaigns(mockData);
+                setIsLoading(false);
+            }, 1500);
+        };
+
+        fetchCampaigns();
+    }, []);
 
     return (
-        <div className="min-h-screen bg-[#0a0a0f] text-white">
-            <FilterBar
-                activeCategory={activeCategory}
-                setActiveCategory={setActiveCategory}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-            />
-            <CampaignGrid campaigns={filteredCampaigns} />
+        <div className="min-h-screen bg-slate-950 text-slate-200">
+            <Navbar />
+
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-white mb-2">Explore Campaigns</h1>
+                    <p className="text-slate-400">Discover and support innovative projects</p>
+                </div>
+
+                {isLoading ? (
+                    <div className="flex items-center justify-center h-64">
+                        <Loader2 className="w-8 h-8 text-violet-500 animate-spin" />
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {campaigns.map((campaign) => (
+                            <CampaignCard
+                                key={campaign.id}
+                                {...campaign}
+                                onClick={() => navigate(`/campaign/${campaign.id}`)}
+                            />
+                        ))}
+                    </div>
+                )}
+            </main>
         </div>
     );
 };

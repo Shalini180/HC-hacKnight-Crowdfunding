@@ -1,0 +1,11 @@
+node_modules/
+.env
+wallet_info.txt
+wallet_info_utf8.txt
+compile_log.txt
+deploy_log*.txt
+deploy_output.txt
+artifacts/
+cache/
+coverage/
+.DS_Store

@@ -1,9 +1,13 @@
 import axios from 'axios';
 
-const PINATA_JWT = "YOUR_PINATA_JWT_HERE"; // Replace with env variable
+const PINATA_JWT = import.meta.env.VITE_PINATA_JWT;
 
 export const uploadMetadata = async (file) => {
     if (!file) return;
+
+    if (!PINATA_JWT) {
+        throw new Error("Missing VITE_PINATA_JWT in .env file");
+    }
 
     try {
         const formData = new FormData();

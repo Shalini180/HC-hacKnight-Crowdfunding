@@ -76,11 +76,10 @@ export const Web3Provider = ({ children }) => {
             const _address = await _signer.getAddress();
             const _network = await _provider.getNetwork();
 
-            // Network Guard (Example: Force Sepolia ID 11155111, or Localhost 31337)
-            // Uncomment to enforce network
-            // if (_network.chainId !== 11155111n) {
-            //   await switchNetwork();
-            // }
+            // Network Guard (Force Sepolia ID 11155111)
+            if (_network.chainId !== 11155111n) {
+                await switchNetwork();
+            }
 
             setProvider(_provider);
             setSigner(_signer);

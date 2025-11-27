@@ -1,171 +1,139 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, Loader2 } from 'lucide-react';
-import PageHeader from './ui/PageHeader';
-import GlassCard from './ui/GlassCard';
-import GradientButton from './ui/GradientButton';
-import useCrowdfunding from '../hooks/useCrowdfunding';
-import { uploadMetadata } from '../services/ipfsService';
-import { ethers } from 'ethers';
+import Navbar from '../Navbar';
+import ImageUploadZone from './create/ImageUploadZone';
+import { Loader2, Rocket } from 'lucide-react';
 
 const CreateFundNew = () => {
     const navigate = useNavigate();
-    const { createCampaign, isLoading } = useCrowdfunding();
+    const [isLoading, setIsLoading] = useState(false);
     const [form, setForm] = useState({
         title: '',
         description: '',
         target: '',
         deadline: '',
-        image: ''
+        image: null
     });
-    const [imageFile, setImageFile] = useState(null);
-    const [isUploading, setIsUploading] = useState(false);
-
-    const handleFormFieldChange = (fieldName, e) => {
-        setForm({ ...form, [fieldName]: e.target.value });
-    };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImageFile(file);
-        }
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!imageFile) {
-            alert("Please select an image");
-            return;
-        }
+        setIsLoading(true);
 
-        setIsUploading(true);
+        // Mock contract call
         try {
-            // 1. Upload to IPFS
-            const imageUrl = await uploadMetadata(imageFile);
-
-            // 2. Create Campaign on Blockchain
-            await createCampaign({
-                ...form,
-                image: imageUrl,
-                target: form.target, // Passed as string, converted in service
-                deadline: form.deadline
-            });
-
-            alert("Campaign Created Successfully!");
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log("Campaign Created:", form);
             navigate('/dashboard');
         } catch (error) {
-            console.error("Submission failed:", error);
-            alert("Failed to create campaign: " + error.message);
+            console.error("Error creating campaign:", error);
         } finally {
-            setIsUploading(false);
+            setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 text-white p-8 relative overflow-hidden">
-            {/* Background Effects */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-900/20 rounded-full blur-[120px]" />
-            </div>
+        <div className="min-h-screen bg-slate-950 text-slate-200">
+            <Navbar />
 
-            <div className="max-w-4xl mx-auto space-y-8">
-                <PageHeader title="Start a Campaign" subtitle="Bring your creative project to life on the blockchain." />
+            <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-white mb-2">Start a Campaign</h1>
+                    <p className="text-slate-400">Bring your creative project to life</p>
+                </div>
 
-                <GlassCard className="p-8 md:p-10">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Title */}
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-400">Campaign Title</label>
-                                <input
-                                    type="text"
-                                    value={form.title}
-                                    onChange={(e) => handleFormFieldChange('title', e)}
-                                    className="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white focus:border-purple-500 focus:outline-none transition-colors"
-                                    placeholder="e.g. Future Tech Initiative"
-                                    required
-                                />
-                            </div>
+                <form onSubmit={handleSubmit} className="space-y-8">
+                    {/* Image Upload */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-300">Campaign Image</label>
+                        <ImageUploadZone onImageSelect={(file) => setForm({ ...form, image: file })} />
+                    </div>
 
-                            {/* Target */}
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-400">Target Amount (ETH)</label>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    value={form.target}
-                                    onChange={(e) => handleFormFieldChange('target', e)}
-                                    className="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white focus:border-purple-500 focus:outline-none transition-colors"
-                                    placeholder="e.g. 10.5"
-                                    required
-                                />
-                            </div>
+                    {/* Basic Info */}
+                    <div className="grid gap-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-300">Campaign Title</label>
+                            <input
+                                type="text"
+                                required
+                                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all"
+                                placeholder="e.g., The Future of Energy"
+                                value={form.title}
+                                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                            />
                         </div>
 
-                        {/* Description */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-400">Story</label>
+                            <label className="text-sm font-medium text-slate-300">Story</label>
                             <textarea
-                                value={form.description}
-                                onChange={(e) => handleFormFieldChange('description', e)}
-                                className="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white focus:border-purple-500 focus:outline-none transition-colors min-h-[150px]"
-                                placeholder="Tell your story..."
                                 required
+                                rows={5}
+                                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all resize-none"
+                                placeholder="Tell potential backers what you're building..."
+                                value={form.description}
+                                onChange={(e) => setForm({ ...form, description: e.target.value })}
                             />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Deadline */}
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-400">End Date</label>
+                                <label className="text-sm font-medium text-slate-300">Target Amount (ETH)</label>
                                 <input
-                                    type="date"
-                                    value={form.deadline}
-                                    onChange={(e) => handleFormFieldChange('deadline', e)}
-                                    className="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white focus:border-purple-500 focus:outline-none transition-colors"
+                                    type="number"
+                                    step="0.01"
                                     required
+                                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all"
+                                    placeholder="0.00"
+                                    value={form.target}
+                                    onChange={(e) => setForm({ ...form, target: e.target.value })}
                                 />
                             </div>
 
-                            {/* Image Upload */}
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-400">Campaign Image</label>
-                                <div className="relative">
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleImageChange}
-                                        className="hidden"
-                                        id="image-upload"
-                                    />
-                                    <label
-                                        htmlFor="image-upload"
-                                        className="flex items-center justify-center w-full bg-black/30 border border-white/10 border-dashed rounded-xl p-4 text-slate-400 hover:text-white hover:border-purple-500 cursor-pointer transition-all"
-                                    >
-                                        <Upload size={20} className="mr-2" />
-                                        {imageFile ? imageFile.name : "Upload Image"}
-                                    </label>
-                                </div>
+                                <label className="text-sm font-medium text-slate-300">Deadline</label>
+                                <input
+                                    type="date"
+                                    required
+                                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all text-slate-200"
+                                    value={form.deadline}
+                                    onChange={(e) => setForm({ ...form, deadline: e.target.value })}
+                                />
                             </div>
                         </div>
+                    </div>
 
-                        <div className="pt-4">
-                            <GradientButton
-                                type="submit"
-                                className="w-full py-4 text-lg"
-                                disabled={isLoading || isUploading}
-                            >
-                                {isLoading || isUploading ? (
-                                    <div className="flex items-center justify-center gap-2">
-                                        <Loader2 className="animate-spin" /> Processing...
-                                    </div>
-                                ) : "Create Campaign"}
-                            </GradientButton>
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold py-4 rounded-xl hover:shadow-[0_0_30px_rgba(124,58,237,0.5)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                <span>Minting Campaign...</span>
+                            </>
+                        ) : (
+                            <>
+                                <Rocket className="w-5 h-5" />
+                                <span>Launch Campaign</span>
+                            </>
+                        )}
+                    </button>
+                </form>
+            </main>
+
+            {/* Loading Overlay */}
+            {isLoading && (
+                <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center">
+                    <div className="text-center space-y-4">
+                        <div className="relative w-16 h-16 mx-auto">
+                            <div className="absolute inset-0 border-4 border-slate-700 rounded-full"></div>
+                            <div className="absolute inset-0 border-4 border-violet-500 rounded-full border-t-transparent animate-spin"></div>
                         </div>
-                    </form>
-                </GlassCard>
-            </div>
+                        <h3 className="text-xl font-bold text-white">Creating on Blockchain</h3>
+                        <p className="text-slate-400">Please confirm the transaction in your wallet...</p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
