@@ -1,35 +1,24 @@
-import React from "react";
-import "./App.css";
-import { HashRouter, Route, Routes } from "react-router-dom";
-// import Dashboard from "./pages/Dashboard/dashboard";
-import CreateFund from "./pages/createfund/createfund";
-// import Display from "./pages/Display/displayfunds";
-// import Authenticate from "./pages/Authenticate/Authenticate";
-// import Donate from "./pages/Donate/donate";
-// import Reactcards from "./pages/Reactcards/reactcards";
-// import Crustcreate from "./pages/Crustcreate/crustcreate";
-import Home from "./pages/Home/Home";
-import Navbar from "./components/Navbar";
+import React from 'react';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import DashboardNew from './components/DashboardNew';
+import DisplayNew from './components/DisplayNew';
+import DonateNew from './components/DonateNew';
+import AuthenticateNew from './components/AuthenticateNew';
 
-// Binary Search: Minimal Imports
-function App() {
+const App = () => {
   return (
-    <HashRouter>
-      <main className="min-h-screen bg-slate-950">
-        <Navbar />
+    <div className="relative sm:-8 p-4 bg-[#0a0a0f] min-h-screen flex flex-row">
+      <div className="flex-1 max-sm:w-full max-w-[1440px] mx-auto sm:pr-5">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/createfund" element={<CreateFund />} />
-          {/* <Route path="/displayfunds" element={<Display />} /> */}
-          {/* <Route path="/donate" element={<Donate />} /> */}
-          {/* <Route path="/reactcards" element={<Reactcards />} /> */}
-          {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-          {/* <Route path="/crustcreate" element={<Crustcreate />} /> */}
-          {/* <Route path="/Authenticate" element={<Authenticate />} /> */}
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route path="/dashboard" element={<DashboardNew />} />
+          <Route path="/campaigns" element={<DisplayNew />} />
+          <Route path="/donate/:id" element={<DonateNew />} />
+          <Route path="/login" element={<AuthenticateNew />} />
         </Routes>
-      </main>
-    </HashRouter>
+      </div>
+    </div>
   );
-}
+};
 
 export default App;
