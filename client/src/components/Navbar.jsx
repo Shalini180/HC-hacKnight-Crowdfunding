@@ -1,5 +1,6 @@
 import React from 'react'
 import { Wallet } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 const Navbar = () => {
     return (
@@ -7,41 +8,29 @@ const Navbar = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
-                    <div className="flex items-center space-x-2">
+                    <Link to="/" className="flex items-center space-x-2">
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
                             <span className="text-white font-bold text-xl">₿</span>
                         </div>
                         <h1 className="text-2xl font-bold gradient-text from-purple-400 to-pink-600">
                             CrowdCoin
                         </h1>
-                    </div>
+                    </Link>
 
                     {/* Navigation Links */}
                     <div className="hidden md:flex items-center space-x-8">
-                        <a
-                            href="/"
-                            className="text-slate-300 hover:text-white transition-colors duration-200"
-                        >
+                        <Link to="/" className="text-slate-300 hover:text-white transition-colors duration-200">
                             Home
-                        </a>
-                        <a
-                            href="/displayfunds"
-                            className="text-slate-300 hover:text-white transition-colors duration-200"
-                        >
+                        </Link>
+                        <Link to="/displayfunds" className="text-slate-300 hover:text-white transition-colors duration-200">
                             Explore
-                        </a>
-                        <a
-                            href="/createfund"
-                            className="text-slate-300 hover:text-white transition-colors duration-200"
-                        >
+                        </Link>
+                        <Link to="/createfund" className="text-slate-300 hover:text-white transition-colors duration-200">
                             Create
-                        </a>
-                        <a
-                            href="/dashboard"
-                            className="text-slate-300 hover:text-white transition-colors duration-200"
-                        >
+                        </Link>
+                        <Link to="/dashboard" className="text-slate-300 hover:text-white transition-colors duration-200">
                             Dashboard
-                        </a>
+                        </Link>
                     </div>
 
                     {/* Connect Wallet Button */}
@@ -53,13 +42,13 @@ const Navbar = () => {
                 </div>
             </div>
 
-            {/* Mobile menu button - placeholder for future implementation */}
+            {/* Mobile menu */}
             <div className="md:hidden px-4 pb-3">
                 <div className="flex flex-col space-y-2">
-                    <a href="/" className="text-slate-300 hover:text-white py-2">Home</a>
-                    <a href="/displayfunds" className="text-slate-300 hover:text-white py-2">Explore</a>
-                    <a href="/createfund" className="text-slate-300 hover:text-white py-2">Create</a>
-                    <a href="/dashboard" className="text-slate-300 hover:text-white py-2">Dashboard</a>
+                    <Link to="/" className="text-slate-300 hover:text-white py-2">Home</Link>
+                    <Link to="/displayfunds" className="text-slate-300 hover:text-white py-2">Explore</Link>
+                    <Link to="/createfund" className="text-slate-300 hover:text-white py-2">Create</Link>
+                    <Link to="/dashboard" className="text-slate-300 hover:text-white py-2">Dashboard</Link>
                 </div>
             </div>
         </nav>
