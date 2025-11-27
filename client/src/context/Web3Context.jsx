@@ -11,6 +11,7 @@ export const Web3Provider = ({ children }) => {
     const [signer, setSigner] = useState(null);
     const [chainId, setChainId] = useState(null);
     const [isConnecting, setIsConnecting] = useState(false);
+    const [error, setError] = useState(null);
 
     // Check for persisted session on mount
     useEffect(() => {
@@ -20,7 +21,16 @@ export const Web3Provider = ({ children }) => {
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_accounts' });
                     if (accounts.length > 0) {
-                        await connectWallet();
+                        // Silent connect
+                        const _provider = new ethers.BrowserProvider(window.ethereum);
+                        const _signer = await _provider.getSigner();
+                        const _address = await _signer.getAddress();
+                        const _network = await _provider.getNetwork();
+
+                        setProvider(_provider);
+                        setSigner(_signer);
+                        setAddress(_address);
+                        setChainId(_network.chainId);
                     } else {
                         localStorage.removeItem('isConnected');
                     }
@@ -51,16 +61,26 @@ export const Web3Provider = ({ children }) => {
 
     const connectWallet = async () => {
         if (!window.ethereum) {
-            alert("Please install MetaMask!");
+            setError("Please install MetaMask!");
             return;
         }
 
         setIsConnecting(true);
+        setError(null);
         try {
             const _provider = new ethers.BrowserProvider(window.ethereum);
+            // Request accounts (opens popup)
+            await _provider.send("eth_requestAccounts", []);
+
             const _signer = await _provider.getSigner();
             const _address = await _signer.getAddress();
             const _network = await _provider.getNetwork();
+
+            // Network Guard (Example: Force Sepolia ID 11155111, or Localhost 31337)
+            // Uncomment to enforce network
+            // if (_network.chainId !== 11155111n) {
+            //   await switchNetwork();
+            // }
 
             setProvider(_provider);
             setSigner(_signer);
@@ -68,11 +88,29 @@ export const Web3Provider = ({ children }) => {
             setChainId(_network.chainId);
 
             localStorage.setItem('isConnected', 'true');
-        } catch (error) {
-            console.error("Connection failed:", error);
-            alert("Failed to connect wallet: " + error.message);
+        } catch (err) {
+            console.error("Connection failed:", err);
+            if (err.code === 4001) {
+                setError("Connection rejected by user.");
+            } else {
+                setError("Failed to connect wallet.");
+            }
         } finally {
             setIsConnecting(false);
+        }
+    };
+
+    const switchNetwork = async () => {
+        try {
+            await window.ethereum.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: '0xaa36a7' }], // Sepolia
+            });
+        } catch (switchError) {
+            // This error code indicates that the chain has not been added to MetaMask.
+            if (switchError.code === 4902) {
+                // Add chain logic here if needed
+            }
         }
     };
 
@@ -91,6 +129,7 @@ export const Web3Provider = ({ children }) => {
             signer,
             chainId,
             isConnecting,
+            error,
             connectWallet,
             disconnectWallet
         }}>
