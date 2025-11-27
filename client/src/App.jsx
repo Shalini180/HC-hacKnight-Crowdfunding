@@ -1,73 +1,70 @@
-this.state = {
-  foo: "bar",
-  resumeData: {}
-};
+import React from "react";
+import "./App.css";
+import { HashRouter, Route, Routes } from "react-router-dom";
+import Dashboard from "./pages/Dashboard/dashboard";
+import CreateFund from "./pages/createfund/createfund";
+import Display from "./pages/Display/displayfunds";
+import Authenticate from "./pages/Authenticate/Authenticate";
+import Donate from "./pages/Donate/donate";
+import Reactcards from "./pages/Reactcards/reactcards";
+import Crustcreate from "./pages/Crustcreate/crustcreate";
+import ReactGA from "react-ga";
+import $ from "jquery";
+import Home from "./pages/Home/Home";
+import Navbar from "./components/Navbar";
 
-ReactGA.initialize("UA-110570651-1");
-ReactGA.pageview(window.location.pathname);
+class App extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      foo: "bar",
+      resumeData: {}
+    };
+
+    ReactGA.initialize("UA-110570651-1");
+    ReactGA.pageview(window.location.pathname);
   }
 
-getResumeData() {
-  $.ajax({
-    url: "./resumeData.json",
-    dataType: "json",
-    cache: false,
-    success: function (data) {
-      this.setState({ resumeData: data });
-    }.bind(this),
-    error: function (xhr, status, err) {
-      console.log(err);
-      alert(err);
-    }
-  });
-  this.state = {
-    foo: "bar",
-    resumeData: {}
-  };
+  getResumeData() {
+    $.ajax({
+      url: "./resumeData.json",
+      dataType: "json",
+      cache: false,
+      success: function (data) {
+        this.setState({ resumeData: data });
+      }.bind(this),
+      error: function (xhr, status, err) {
+        console.log(err);
+        alert(err);
+      }
+    });
+  }
 
-  ReactGA.initialize("UA-110570651-1");
-  ReactGA.pageview(window.location.pathname);
-}
+  componentDidMount() {
+    this.getResumeData();
+  }
 
-getResumeData() {
-  $.ajax({
-    url: "./resumeData.json",
-    dataType: "json",
-    cache: false,
-    success: function (data) {
-      this.setState({ resumeData: data });
-    }.bind(this),
-    error: function (xhr, status, err) {
-      console.log(err);
-      alert(err);
-    }
-  });
-}
+  render() {
 
-componentDidMount() {
-  this.getResumeData();
-}
-
-render() {
-
-  return (
-    <HashRouter>
-      <main className="min-h-screen bg-slate-950">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />}></Route>
-          <Route path="/createfund" element={<CreateFund />}></Route>
-          <Route path="/displayfunds" element={<Display />}></Route>
-          <Route path="/donate" element={<Donate />}></Route>
-          <Route path="/reactcards" element={<Reactcards />}></Route>
-          <Route path="/dashboard" element={<Dashboard />}></Route>
-          <Route path="/crustcreate" element={<Crustcreate />}></Route>
-          <Route path="/Authenticate" element={<Authenticate />}></Route>
-        </Routes>
-      </main>
-    </HashRouter>
-  );
-}
+    return (
+      <HashRouter>
+        <main className="min-h-screen bg-slate-950">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />}></Route>
+            <Route path="/createfund" element={<CreateFund />}></Route>
+            <Route path="/displayfunds" element={<Display />}></Route>
+            <Route path="/donate" element={<Donate />}></Route>
+            <Route path="/reactcards" element={<Reactcards />}></Route>
+            <Route path="/dashboard" element={<Dashboard />}></Route>
+            <Route path="/crustcreate" element={<Crustcreate />}></Route>
+            <Route path="/Authenticate" element={<Authenticate />}></Route>
+          </Routes>
+        </main>
+      </HashRouter>
+    );
+  }
 
 }
 export default App;
